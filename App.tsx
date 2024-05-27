@@ -1,118 +1,125 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, { useState } from 'react'
+import { StyleSheet, Text, View , Button, TextInput, Alert} from 'react-native'
+import BouncyCheckbox from "react-native-bouncy-checkbox";
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+ const App=()=> {
+const [password , setPassword]= useState('')
+const [upperCase , setUppercase]= useState(false)
+const [lowerCase , setLowerCase]= useState(false)
+const [digits , setDigits]= useState(false)
+const [symbols , setSymbols]= useState(false)
+const [passwordLength , setPasswordLength]= useState<any>()
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
+const handleGeneratePassword=(length:number)=> {
+  let generatePassword = ''
+  let upperCaseChars= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  let lowerCaseChars= 'abcdefghijklmnopqrstuvwxyz'
+  let digitsChars= '0123456789'
+  let symbolsChars= '!@#$%^&*()_+-={}[]|:;"<>,.?/~`'
+  if (passwordLength < 4 || passwordLength > 14) {
+    Alert.alert('Password length should be between 4 and 14 characters');
+    return '';
+  }
+  if(upperCase){
+    generatePassword+=upperCaseChars
+  }
+  if(lowerCase){
+    generatePassword+=lowerCaseChars
+  }
+  if(digits){
+    generatePassword+=digitsChars
+  }
+  if(symbols){
+    generatePassword+=symbolsChars
+  }
+    let passwordcreated = createPassword(generatePassword , length)
+    setPassword(passwordcreated)
 }
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+const createPassword =(pass :string, passLength:number) => {
+  let result = '';
+    for (let i = 0; i < passLength; i++) {
+      const charindex = Math.round(Math.random() * (pass.length-1));
+      result += pass.charAt(charindex);
+    }
+    return result;
   };
-
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
+    <>
+    <View style={[styles.container]}>
+      <Text style={styles.heading}>Password Generator</Text>
+      <TextInput  
+      placeholder="Enter Password Length"
+        style={styles.input}
+        onChangeText={(text)=>setPasswordLength(+text)}
+        value={passwordLength?.toString()}
+        />
+         </View>
+        <View style={{display:'flex' , flexDirection:'row' , justifyContent:'space-between' , margin:10}}>
+          <Text>Include Uppercase</Text>
+         <BouncyCheckbox
+         fillColor="#9342f5"
+         isChecked={upperCase}
+         onPress={()=>setUppercase(!upperCase)}
+          />
+          </View>
+        <View style={{display:'flex' , flexDirection:'row' , justifyContent:'space-between', margin:10}}>
+          <Text>Include Lowercase</Text>
+         <BouncyCheckbox
+         fillColor='#00C0EE'
+         isChecked={lowerCase}
+         onPress={()=>setLowerCase(!lowerCase)}
+          />
+          </View>
+        <View style={{display:'flex' , flexDirection:'row' , justifyContent:'space-between', margin:10,}}>
+          <Text>Include Digits</Text>
+         <BouncyCheckbox
+         isChecked={digits}
+         onPress={()=>setDigits(!digits)}
+          />
+          </View>
+        <View style={{display:'flex' , flexDirection:'row' , justifyContent:'space-between', margin:10}}>
+          <Text>Include Symbols</Text>
+         <BouncyCheckbox
+         fillColor='red'
+         isChecked={symbols}
+         onPress={()=>setSymbols(!symbols)}
+          />
+          </View>
+          <View style={{margin:20}}>
+      <Button title='Generate Password' onPress={()=>handleGeneratePassword(passwordLength)}/>
+      </View>
+      {password && <Text selectable style={styles.passwordText}>{password}</Text>}
+      </>
+  )
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container:{
+    alignItems:'center',
+    marginVertical:10,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  heading:{
+    fontSize:24,
+    fontWeight:'bold',
+    marginBottom:10
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+  input:{
+    margin:10,
+    paddingHorizontal:5,
+    borderWidth:1,
+    borderRadius:10
+},
+passwordText:{
+margin:15,
+fontSize:24,
+color:'#fff',
+fontWeight:'bold',
+textAlign:'center',
+borderWidth:1,
+paddingHorizontal:15,
+backgroundColor:'purple',
+}
 
-export default App;
+})
+export default App
